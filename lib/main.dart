@@ -7,12 +7,19 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Welcome to Flutter',
-      theme: new ThemeData(
-        primaryColor: Colors.black,
-      ),
-      home: new RandomWords(),
-    );
+        title: 'Welcome to Flutter',
+        theme: new ThemeData(
+          primaryColor: Colors.black,
+        ),
+//        home: new RandomWords(),
+        //注册路由表
+        routes: {
+          "Page1": (context) {
+            return TipRoute(text: ModalRoute.of(context).settings.arguments);
+          },
+          "/": (context) => RandomWords(),
+          //注册首页路由
+        });
   }
 }
 
@@ -114,6 +121,78 @@ class RandomWordsState extends State<RandomWords> {
         ],
       ),
       body: _buildSuggestions(),
+      floatingActionButton: new FloatingActionButton(
+        //1:async包装异步的方法,"同步"处理异步的返回
+//        onPressed: () async {
+//          var result = await Navigator.push(
+//            context,
+//            MaterialPageRoute(
+//              builder: (context) {
+//                return TipRoute(
+//                  // 路由参数
+//                  text: "传递的文本",
+//                );
+//              },
+//            ),
+//          );
+//          print("路由返回值: $result");
+//        },
+        onPressed: () {
+          //2:操作返回的Future结构
+//          Future result = Navigator.push(
+//            context,
+//            MaterialPageRoute(
+//              builder: (context) {
+//                return TipRoute(
+//                  // 路由参数
+//                  text: "传递的文本",
+//                );
+//              },
+//            ),
+//          );
+//          result.then((data) {
+//            print("result.then((data): $data");
+//          });
+//        },
+          Future result =
+              Navigator.pushNamed(context, "Page1", arguments: "传递参数");
+          result.then((data) {
+            print("result.then((data): $data");
+          });
+        },
+        child: new Icon(Icons.add),
+      ),
+    );
+  }
+}
+
+class TipRoute extends StatelessWidget {
+  TipRoute({
+    Key key,
+    @required this.text, // 接收一个text参数
+  }) : super(key: key);
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("提示"),
+      ),
+      body: Padding(
+        padding: EdgeInsets.all(18),
+        child: Center(
+          child: Column(
+            children: <Widget>[
+              Text(text),
+              RaisedButton(
+                onPressed: () => Navigator.pop(context, "我是返回值"),
+                child: Text("返回"),
+              )
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
